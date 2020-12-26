@@ -42,7 +42,8 @@ INSTALLED_APPS = [
     'dj_rest_auth.registration',
 
     'users',
-    'nursury'
+    'nursury',
+    'core'
 ]
 
 SITE_ID = 1
