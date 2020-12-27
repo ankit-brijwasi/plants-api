@@ -1,7 +1,7 @@
 from django.urls import path
-from nursury.views import NursuryView
+from nursury.views import NursuryAPIView
 
 urlpatterns = [
-    path('', NursuryView.as_view()),
-    path('<int:pk>/', NursuryView.as_view()),
+    path('', NursuryAPIView.as_view()),
+    path('<int:pk>/', NursuryAPIView.as_view()),
 ]

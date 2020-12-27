@@ -18,7 +18,7 @@ class IsNursury(permissions.BasePermission):
         return request.user.type == "nursury"
 
 
-class NursuryView(APIView):
+class NursuryAPIView(APIView):
     '''
     Nursury View
 
