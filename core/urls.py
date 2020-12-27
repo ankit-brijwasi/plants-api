@@ -2,5 +2,5 @@ from django.urls import path
 from core import views
 
 urlpatterns = [
-    path('', views.OrderAPIView.as_view()),
+    path('', views.CartAPIView.as_view()),
 ]

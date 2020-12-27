@@ -4,14 +4,14 @@ from nursury.serializers import Plant, PlantSerializer
 from rest_framework import serializers
 from users.serializers import UserSerializer
 
-from core.models import Order, OrderDetails
+from core.models import Cart, CartDetails
 
 User = get_user_model()
 
 
-class OrderDetailSerializer(serializers.ModelSerializer):
+class CartDetailSerializer(serializers.ModelSerializer):
     class Meta:
-        model = OrderDetails
+        model = CartDetails
         fields = "__all__"
 
     def to_representation(self, instance):
@@ -22,25 +22,25 @@ class OrderDetailSerializer(serializers.ModelSerializer):
         return data
 
 
-class OrderSerializer(serializers.ModelSerializer):
+class CartSerializer(serializers.ModelSerializer):
     placed_by = UserSerializer(read_only=False)
-    details = OrderDetailSerializer(many=True, read_only=False)
+    details = CartDetailSerializer(many=True, read_only=False)
 
     class Meta:
-        model = Order
+        model = Cart
         fields = "__all__"
 
     def create(self, validated_data):
         user = validated_data.pop('placed_by')
         user = User.objects.get(email=user.get('email'))
 
-        order, _ = Order.objects.get_or_create(placed_by=user)
+        cart, _ = Cart.objects.get_or_create(placed_by=user, status='CART')
 
-        order_details = validated_data.pop('details')
-        for order_detail in order_details:
-            temp, created = order.details.get_or_create(
-                plant=order_detail.get('plant'))
-            temp.quantity = order_detail.get('quantity')
+        cart_details = validated_data.pop('details')
+        for cart_detail in cart_details:
+            temp, created = cart.details.get_or_create(
+                plant=cart_detail.get('plant'))
+            temp.quantity = cart_detail.get('quantity')
             temp.save()
 
-        return order
+        return cart

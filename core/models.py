@@ -4,8 +4,14 @@ from nursury.models import Plant
 
 User = get_user_model()
 
+STATUS = (
+    ('CART', 'CART'),
+    ('ORDERED', 'ORDERED'),
+    ('DELIVERED', 'DELIVERED'),
+)
 
-class OrderDetails(models.Model):
+
+class CartDetails(models.Model):
     plant = models.ForeignKey(
         to=Plant,
         on_delete=models.CASCADE
@@ -27,19 +33,19 @@ class OrderDetails(models.Model):
         super().save(*args, **kwargs)
 
 
-class Order(models.Model):
+class Cart(models.Model):
     placed_by = models.ForeignKey(
         to=User,
         on_delete=models.CASCADE,
         related_name="placed_by"
     )
     details = models.ManyToManyField(
-        to=OrderDetails,
+        to=CartDetails,
         related_name="details"
     )
-    completed = models.BooleanField(default=False)
-    ordered = models.BooleanField(default=False)
+    status = models.CharField(
+        choices=STATUS, default='CART', max_length=10)
     ordered_on = models.DateTimeField(blank=True, null=True)
 
     def __str__(self):
-        return f"{self.placed_by} order"
+        return f"{self.placed_by} Cart"
