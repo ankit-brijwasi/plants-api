@@ -43,7 +43,8 @@ INSTALLED_APPS = [
 
     'users',
     'nursury',
-    'core'
+    'core',
+    'utils',
 ]
 
 SITE_ID = 1
