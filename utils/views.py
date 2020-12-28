@@ -13,26 +13,28 @@ from nursury.views import IsNursury
 User = get_user_model()
 
 
-@api_view(['POST'])
+@api_view(['GET'])
 def generate_order(request):
     cart = get_object_or_404(
         Cart, Q(placed_by=request.user) & Q(status='CART'))
     cart.status = 'ORDERED'
     cart.ordered_on = timezone.now()
     cart.save()
-    return Response(status=status.HTTP_200_OK)
+    serializer = CartSerializer(cart)
+    return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated, IsAdminUser])
 def order_complete(request):
-    cart = get_object_or_404(Cart, pk=request.data.get('pk'))
+    cart = get_object_or_404(Cart, pk=request.data.get('cart_id'))
     cart.status = 'DELIVERED'
     cart.save()
-    return Response(status=status.HTTP_200_OK)
+    serializer = CartSerializer(cart)
+    return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-@api_view(['POST'])
+@api_view(['GET'])
 @permission_classes([IsAuthenticated, IsNursury])
 def view_orders(request):
     orders = Cart.objects.all().prefetch_related('details')
