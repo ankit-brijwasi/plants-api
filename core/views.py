@@ -1,5 +1,5 @@
 from django.db.models import Q
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -56,3 +56,7 @@ class CartAPIView(APIView):
 
         cart.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+def home(request):
+    return render(request, "base.html")
