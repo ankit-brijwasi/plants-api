@@ -3,6 +3,7 @@ from django.shortcuts import get_object_or_404
 from django.db.models import Q
 
 from rest_framework import parsers, permissions, status
+from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -13,8 +14,6 @@ class IsNursury(permissions.BasePermission):
     message = "only nursuries are allowed"
 
     def has_permission(self, request, view):
-        if request.method == "GET":
-            return True
         return request.user.type == "nursury"
 
 
@@ -28,7 +27,7 @@ class NursuryAPIView(APIView):
     permission_classes = (permissions.IsAuthenticated, IsNursury)
 
     def get(self, request, pk=None):
-        queryset = models.Plant.objects.all()
+        queryset = models.Plant.objects.filter(user=request.user)
         if pk:
             plant = get_object_or_404(queryset, pk=pk)
             serializer = serializers.PlantSerializer(plant, many=False)
@@ -75,3 +74,14 @@ class NursuryAPIView(APIView):
         )
         plant.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+@api_view(['GET'])
+def plants(request, pk=None):
+    many = True
+    queryset = models.Plant.objects.all()
+    if pk:
+        queryset = get_object_or_404(queryset, pk=pk)
+        many = False
+    serializer = serializers.PlantSerializer(queryset, many=many)
+    return Response(serializer.data, status=status.HTTP_200_OK)
