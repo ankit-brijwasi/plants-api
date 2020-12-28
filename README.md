@@ -1,5 +1,7 @@
 # Plants app backend API's
 
+> LIVE APPLICATION DEMO AT: [https://plants-app--api.herokuapp.com](https://plants-app--api.herokuapp.com)
+
 **FOR PROTECTED ROUTES HEADER SHOULD CONTAIN THE AUTHORIZATION TOKEN IN THE GIVEN FORMAT**
 
 `Authorization: Token *your token here*`
