@@ -16,7 +16,8 @@ class CartAPIView(APIView):
     '''
 
     def get(self, request):
-        orders = get_object_or_404(models.Cart, placed_by=request.user)
+        orders = get_object_or_404(models.Cart, Q(
+            placed_by=request.user) & Q(status='CART'))
         serializer = serializers.CartSerializer(orders, many=False)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -32,20 +33,26 @@ class CartAPIView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request):
-        order = get_object_or_404(models.Cart, placed_by=request.user)
+        cart = get_object_or_404(models.Cart, placed_by=request.user)
 
-        if order.status == 'DELIVERED':
+        if cart.status == 'DELIVERED' or cart.status == 'ORDERED':
             return Response(status=status.HTTP_204_NO_CONTENT)
 
         if request.query_params.get('delete') == 'item':
             if not request.query_params.get('id'):
-                return Response({'message': 'Item Id is missing'}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({'message': 'id is missing'}, status=status.HTTP_400_BAD_REQUEST)
+
             item = get_object_or_404(
                 models.CartDetails,
                 Q(details__placed_by=request.user) &
                 Q(id=request.query_params.get('id'))
             )
             item.delete()
+
+            if len(cart.details.all()) == 0:
+                cart.delete()
+
             return Response(status=status.HTTP_204_NO_CONTENT)
-        order.delete()
+
+        cart.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
